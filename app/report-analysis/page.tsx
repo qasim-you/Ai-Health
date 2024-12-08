@@ -1,22 +1,25 @@
 "use client"
 
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 
 export default function ReportAnalysis() {
   const [file, setFile] = useState<File | null>(null)
   const [isLoading, setIsLoading] = useState(false)
-  const router = useRouter()
+  const [analysis, setAnalysis] = useState<string | null>(null)
+  const [error, setError] = useState<string | null>(null)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!file) return
 
     setIsLoading(true)
+    setAnalysis(null)
+    setError(null)
     const formData = new FormData()
     formData.append('file', file)
 
@@ -25,21 +28,20 @@ export default function ReportAnalysis() {
         method: 'POST',
         body: formData,
       })
+      const result = await response.json()
       if (response.ok) {
-        const result = await response.json()
-        router.push(`/analysis-result?type=report&id=${result.id}`)
+        setAnalysis(result.analysis)
       } else {
-        throw new Error('Failed to analyze report')
+        throw new Error(result.error || 'Failed to analyze report')
       }
     } catch (error) {
       console.error('Error:', error)
-      alert('An error occurred while analyzing the report. Please try again.')
+      setError(error instanceof Error ? error.message : 'An unknown error occurred')
     } finally {
       setIsLoading(false)
     }
   }
 
-  // Specify the correct type for the event in the onChange handler
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files ? e.target.files[0] : null
     setFile(file)
@@ -50,26 +52,39 @@ export default function ReportAnalysis() {
       <Card className="max-w-2xl mx-auto">
         <CardHeader>
           <CardTitle>Medical Report Analysis</CardTitle>
-          <CardDescription>Upload a medical report (PDF) for AI analysis</CardDescription>
+          <CardDescription>Upload a medical report (PDF, PNG, DOCX, etc.) for AI analysis</CardDescription>
         </CardHeader>
         <form onSubmit={handleSubmit}>
           <CardContent>
-            <Label htmlFor="report-upload">Upload Medical Report (PDF)</Label>
+            <Label htmlFor="report-upload">Upload Medical Report</Label>
             <Input
               id="report-upload"
               type="file"
-              accept=".pdf"
+              accept=".pdf,.png,.jpg,.jpeg,.doc,.docx"
               onChange={handleFileChange}
               required
             />
           </CardContent>
-          <CardFooter>
+          <CardFooter className="flex flex-col items-stretch gap-4">
             <Button type="submit" className="w-full" disabled={isLoading || !file}>
               {isLoading ? 'Analyzing...' : 'Analyze Report'}
             </Button>
+            {error && (
+              <Alert variant="destructive">
+                <AlertTitle>Error</AlertTitle>
+                <AlertDescription>{error}</AlertDescription>
+              </Alert>
+            )}
+            {analysis && (
+              <div className="mt-4 p-4 bg-gray-100 rounded-md">
+                <h3 className="font-semibold mb-2">Analysis Result:</h3>
+                <p>{analysis}</p>
+              </div>
+            )}
           </CardFooter>
         </form>
       </Card>
     </div>
   )
 }
+
