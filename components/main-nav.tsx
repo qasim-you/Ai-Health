@@ -12,7 +12,7 @@ export function MainNav() {
       <div className="container flex items-center justify-between h-16">
         {/* Logo */}
         <Link href="/" className="font-bold text-lg mx-5">
-          HealthCare AI
+          Health Bot
         </Link>
 
         {/* Hamburger Menu (visible on small screens) */}
