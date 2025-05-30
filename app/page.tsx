@@ -30,7 +30,7 @@ export default function Home() {
               Describe your symptoms for AI-powered analysis
             </CardContent>
           </Card>
-        </Link>
+        </Link> 
         <Link href="/report-analysis">
           <Card className="hover:shadow-lg transition-shadow">
             <CardHeader>
