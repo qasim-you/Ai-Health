@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { CalendarDays, ClipboardList, Pill, Stethoscope, FileText } from 'lucide-react'
-  
+
 export default function Home() {
   return (
     <div className="container mx-auto px-4 py-8">
@@ -53,8 +53,7 @@ export default function Home() {
             <CardContent>
               Schedule and manage your medical appointments
             </CardContent>
-          </Card>
-        </Link>
+          </Card> .         </Link>
         <Link href="/medications">
           <Card className="hover:shadow-lg transition-shadow">
             <CardHeader>
